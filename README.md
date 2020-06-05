@@ -18,7 +18,9 @@ https://www.robocore.net/upload/attachments/manual_conjunto_ir_digital_1_0_600.p
 Controle de acesso
    - teclado
    - memória
+
 Controle de presença
   - sensor de presença
+
 Controle de luminosidade
   - sensor de luz

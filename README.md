@@ -11,3 +11,15 @@ https://www.robocore.net/upload/attachments/manual_conjunto_ir_digital_1_0_600.p
 - Controle de luminosidade - Para identificar se a luz do ambiente está ligada ou não. 
 	LDR - http://tutavirtual.blogspot.com/2014/12/primeiro-circuito-no-proteus-sensor-ldr.html
 - Sistema de Alerta para usuário
+
+
+
+
+Módulos que falta:
+Controle de acesso
+   - teclado
+   - memória
+Controle de presença
+  - sensor de presença
+Controle de luminosidade
+  - sensor de luz

@@ -449,25 +449,6 @@ void loop() {
       Wire.beginTransmission (SLAVE_ADDRESS);
       Wire.write (msg1);
       Wire.endTransmission ();
-      int resp = 0;
-      if(resp==0){
-        luzTeclado(1);
-        delay(67);
-        luzTeclado(2);
-        delay(66);
-        luzTeclado(3);
-        delay(67);
-      }
-      else{
-        luzTeclado(8);
-        delay(50);
-        luzTeclado(9);
-        delay(50);
-        luzTeclado(10);
-        delay(50);
-        luzTeclado(11);
-        delay(50);
-      }
       cont = 0;
       delay(delaytime);
 

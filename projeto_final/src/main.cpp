@@ -15,16 +15,15 @@ int confirma;
 int raw_temp;
 int delaytime=200;
 float temperaturaAtual;
-float temperaturaLimite = 23;
+float temperaturaLimite = 23.00;
 int menu = 0;
-int menuAnt = 0;
 
-int funcionamento = 1;
-int acesso = 1;
-int temperatura = 1;
-int presenca = 1;
-int luminosidade = 1; 
-int alarme = 1;
+int funcionamento = 0;
+int acesso = 0;
+int temperatura = 0;
+int presenca = 0;
+int luminosidade = 0; 
+int alarme = 0;
 
 int sensorPresenca = 0;
 int sensorLuz = 0;
@@ -152,50 +151,22 @@ void loop() {
 	//int senha = digitalRead(); //add teclado
 
 	if((funcionamento==1)&&(alarme==1)&&(sensorPresenca==1)){
-		if(menuAnt > 7){
-			menu = 8;
-			lcd.clear();
-		}
-		else{
-			menuAnt = menu;
-			menu = 8;
-			lcd.clear();
-		}
+		menu = 8;
+		lcd.clear();
 	}
 	else if((funcionamento==1)&&(acesso==1)&&(senha!=0)&&(alarme==0)){
-		if(menuAnt > 7){
-			menu = 9;
-			lcd.clear();
-		}
-		else{
-			menuAnt = menu;
-			menu = 9;
-			lcd.clear();
-		}
+		menu = 9;
+		lcd.clear();
 	}
 	else if((funcionamento==1)&&(temperaturaAtual > temperaturaLimite)){
-		if(menuAnt > 7){
-			menu = 10;
-			lcd.clear();
-		}
-		else{
-			menuAnt = menu;
-			menu = 10;
-			lcd.clear();
-		}
+		menu = 10;
+		lcd.clear();
 	}
 	else if((funcionamento==1)&&(sensorPresenca==0)&&(sensorLuz==1)){
-		if(menuAnt > 7){
-			menu = 11;
-			lcd.clear();
-		}
-		else{
-			menuAnt = menu;
-			menu = 11;
-			lcd.clear();
-		}
+		menu = 11;
+		lcd.clear();
 	}
-	if(menu==0){
+	else if(menu==0){
 		lcd.setCursor(0,0);
 		lcd.print("SERVICO ATIVADO");
 		if(funcionamento==0){	
@@ -207,13 +178,11 @@ void loop() {
 			lcd.print(msg2);
 		}
 		if(mais){
-			menuAnt = menu;
 			menu = 1;
 			delay(delaytime);
 			lcd.clear();
 		}
 		else if(menos){
-			menuAnt = menu;
 			menu = 7;
 			delay(delaytime);
 			lcd.clear();
@@ -236,13 +205,11 @@ void loop() {
 			lcd.print(msg2);
 		}
 		if(mais){
-			menuAnt = menu;
 			menu = 2;
 			delay(delaytime);
 			lcd.clear();
 		}
 		else if(menos){
-			menuAnt = menu;
 			menu = 0;
 			delay(delaytime);
 			lcd.clear();
@@ -265,13 +232,11 @@ void loop() {
 			lcd.print(msg2);
 		}
 		if(mais){
-			menuAnt = menu;
 			menu = 3;
 			delay(delaytime);
 			lcd.clear();
 		}
 		else if(menos){
-			menuAnt = menu;
 			menu = 1; 
 			delay(delaytime);
 			lcd.clear();
@@ -288,19 +253,16 @@ void loop() {
 		lcd.setCursor(0,1);
 		lcd.print(temperaturaLimite);
 		if(mais){
-			menuAnt = menu;
 			menu = 5;
 			delay(delaytime);
 			lcd.clear();
 		}
 		else if(menos){
-			menuAnt = menu;
 			menu = 2;
 			delay(delaytime);
 			lcd.clear();
 		}
 		else if(confirma){
-			menuAnt = menu;
 			menu = 4;
 			delay(delaytime);
 			lcd.clear();
@@ -323,7 +285,6 @@ void loop() {
 		}
 		else if(confirma){
 			menu = 3;
-			menuAnt = menu;
 			delay(delaytime);
 			lcd.clear();
 		}
@@ -340,13 +301,11 @@ void loop() {
 			lcd.print(msg2);
 		}
 		if(mais){
-			menuAnt = menu;
 			menu = 6;
 			delay(delaytime);
 			lcd.clear();
 		}
 		else if(menos){
-			menuAnt = menu;
 			menu = 3;
 			delay(delaytime);
 			lcd.clear();
@@ -369,13 +328,11 @@ void loop() {
 			lcd.print(msg2);
 		}
 		if(mais){
-			menuAnt = menu;
 			menu = 7;
 			delay(delaytime);
 			lcd.clear();
 		}
 		else if(menos){
-			menuAnt = menu;
 			menu = 5; 
 			delay(delaytime);
 			lcd.clear();
@@ -398,13 +355,11 @@ void loop() {
 			lcd.print(msg2);
 		}
 		if(mais){
-			menuAnt = menu;
 			menu = 0;
 			delay(delaytime);
 			lcd.clear();
 		}
 		else if(menos){
-			menuAnt = menu;
 			menu = 6; 
 			delay(delaytime);
 			lcd.clear();
@@ -431,12 +386,9 @@ void loop() {
 		lcd.setCursor(15,1);
 		lcd.print(sensorPresenca);
 		alerta(200);
-		if(confirma){
-			menu = menuAnt;
-			delayMicroseconds(200);
-			delay(delaytime);
-			lcd.clear();
-		}
+		menu = 0;
+		delay(delaytime);
+		lcd.clear();
 	}
 	else if(menu==9){
 		lcd.setCursor(0,0);
@@ -458,12 +410,9 @@ void loop() {
 		lcd.setCursor(11,1);
 		lcd.print(senha);
 		alerta(100);
-		if(confirma){
-			menu = menuAnt;
-			delayMicroseconds(200);
-			delay(delaytime);
-			lcd.clear();
-		}
+		menu = 0;
+		delay(delaytime);
+		lcd.clear();
 	}
 	else if(menu==10){
 		lcd.setCursor(0,0);
@@ -476,12 +425,9 @@ void loop() {
 		lcd.setCursor(11,1);
 		lcd.print(temperaturaAtual);
 		alerta(400);
-		if(confirma){
-			menu = menuAnt;
-			delayMicroseconds(200);
-			delay(delaytime);
-			lcd.clear();
-		}
+		menu = 0;
+		delay(delaytime);
+		lcd.clear();
 	}
 	else if(menu==11){
 		lcd.setCursor(0,0);
@@ -499,11 +445,8 @@ void loop() {
 		lcd.print(sensorPresenca);
 		lcd.print(senha);
 		alerta(500);
-		if(confirma){
-			menu = menuAnt;
-			delayMicroseconds(200);
-			delay(delaytime);
-			lcd.clear();
-		}
+		menu = 0;
+		delay(delaytime);
+		lcd.clear();
 	}
 }

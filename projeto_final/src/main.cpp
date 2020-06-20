@@ -1,27 +1,30 @@
 #include <Arduino.h>
-
+#include <Wire.h>
 #include <LiquidCrystal.h>
-LiquidCrystal lcd(12,11,5,4,3,2);
-#define DS18B20_PIN   1
-char msg1[16] = "[ ]SIM  [*]NÃO";
-char msg2[16] = "[*]SIM  [ ]NÃO";
 
+LiquidCrystal lcd(12,11,5,4,3,2);
+
+const byte MY_ADDRESS = 42; // endereço so escrevo. precisa configurar no mestre também!
+#define DS18B20_PIN  A0
+
+char msg1[16] = "[ ]SIM  [*]NAO";
+char msg2[16] = "[*]SIM  [ ]NAO";
 int mais;                     
 int menos;
 int confirma;
 int raw_temp;
 int delaytime=200;
-int temperaturaAtual;
-int temperaturaLimite = 25;
+float temperaturaAtual;
+float temperaturaLimite = 23;
 int menu = 0;
 int menuAnt = 0;
 
-int funcionamento = 0;
-int acesso = 0;
-int temperatura = 0;
-int presenca = 0;
-int luminosidade = 0; 
-int alarme = 0;
+int funcionamento = 1;
+int acesso = 1;
+int temperatura = 1;
+int presenca = 1;
+int luminosidade = 1; 
+int alarme = 1;
 
 int sensorPresenca = 0;
 int sensorLuz = 0;
@@ -107,14 +110,14 @@ void inicializar(){
 	lcd.setCursor(0,0);
 	lcd.print("CONTROLE CPD");
 	lcd.setCursor(0,1);
-	lcd.print("AND3000");
-	delay(500);
+	lcd.print("NDA3000");
+	delay(300);
 	lcd.clear();
 }
  
 void alerta(int tempo){ 
 	int count=0;
-	int cont=10000 /( tempo * 2);
+	int cont=2000 /( tempo * 2);
 	while(count<=cont){
 		digitalWrite(13, HIGH);   
 		digitalWrite(10, HIGH);   
@@ -139,27 +142,59 @@ void setup(){
 }
 
 void loop() {
+	sensorLuz = digitalRead(0);
+	sensorPresenca = digitalRead(1); 
 	mais      = digitalRead(6);                       
 	menos     = digitalRead(7);
 	confirma  = digitalRead(8);
 	temperaturaAtual = medirTemp(raw_temp);
-	sensorPresenca = digitalRead(1); // add sensor de presenca
-	sensorLuz = digitalRead(0); //add sensor de luz
+
 	//int senha = digitalRead(); //add teclado
-	
+
 	if((funcionamento==1)&&(alarme==1)&&(sensorPresenca==1)){
-		menu = 8;
+		if(menuAnt > 7){
+			menu = 8;
+			lcd.clear();
+		}
+		else{
+			menuAnt = menu;
+			menu = 8;
+			lcd.clear();
+		}
 	}
 	else if((funcionamento==1)&&(acesso==1)&&(senha!=0)&&(alarme==0)){
-		menu = 9;
+		if(menuAnt > 7){
+			menu = 9;
+			lcd.clear();
+		}
+		else{
+			menuAnt = menu;
+			menu = 9;
+			lcd.clear();
+		}
 	}
 	else if((funcionamento==1)&&(temperaturaAtual > temperaturaLimite)){
-		menu = 10;
+		if(menuAnt > 7){
+			menu = 10;
+			lcd.clear();
+		}
+		else{
+			menuAnt = menu;
+			menu = 10;
+			lcd.clear();
+		}
 	}
 	else if((funcionamento==1)&&(sensorPresenca==0)&&(sensorLuz==1)){
-		menu = 11;
+		if(menuAnt > 7){
+			menu = 11;
+			lcd.clear();
+		}
+		else{
+			menuAnt = menu;
+			menu = 11;
+			lcd.clear();
+		}
 	}
-	
 	if(menu==0){
 		lcd.setCursor(0,0);
 		lcd.print("SERVICO ATIVADO");
@@ -172,14 +207,14 @@ void loop() {
 			lcd.print(msg2);
 		}
 		if(mais){
-			menu = 1;
 			menuAnt = menu;
+			menu = 1;
 			delay(delaytime);
 			lcd.clear();
 		}
 		else if(menos){
-			menu = 7;
 			menuAnt = menu;
+			menu = 7;
 			delay(delaytime);
 			lcd.clear();
 		}
@@ -189,10 +224,9 @@ void loop() {
 			lcd.clear();
 		}
 	}
-
 	else if(menu==1){
 		lcd.setCursor(0,0);
-		lcd.print("");
+		lcd.print("CONTROLE ACESSO");
 		if(acesso==0){	
 			lcd.setCursor(0,1);
 			lcd.print(msg1);
@@ -202,14 +236,14 @@ void loop() {
 			lcd.print(msg2);
 		}
 		if(mais){
-			menu = 2;
 			menuAnt = menu;
+			menu = 2;
 			delay(delaytime);
 			lcd.clear();
 		}
 		else if(menos){
-			menu = 0;
 			menuAnt = menu;
+			menu = 0;
 			delay(delaytime);
 			lcd.clear();
 		}
@@ -219,7 +253,6 @@ void loop() {
 			lcd.clear();
 		}
 	}
-
 	else if(menu==2){
 		lcd.setCursor(0,0);
 		lcd.print("CONTROLE TEMPE");
@@ -232,14 +265,14 @@ void loop() {
 			lcd.print(msg2);
 		}
 		if(mais){
-			menu = 3;
 			menuAnt = menu;
+			menu = 3;
 			delay(delaytime);
 			lcd.clear();
 		}
 		else if(menos){
-			menu = 1; 
 			menuAnt = menu;
+			menu = 1; 
 			delay(delaytime);
 			lcd.clear();
 		}
@@ -249,32 +282,30 @@ void loop() {
 			lcd.clear();
 		}
 	}
-
 	else if(menu==3){
 		lcd.setCursor(0,0);
 		lcd.print("TEMPERATURA MAX");
 		lcd.setCursor(0,1);
 		lcd.print(temperaturaLimite);
 		if(mais){
-			menu = 5;
 			menuAnt = menu;
+			menu = 5;
 			delay(delaytime);
 			lcd.clear();
 		}
 		else if(menos){
-			menu = 2;
 			menuAnt = menu;
+			menu = 2;
 			delay(delaytime);
 			lcd.clear();
 		}
 		else if(confirma){
-			menu = 4;
 			menuAnt = menu;
+			menu = 4;
 			delay(delaytime);
 			lcd.clear();
 		}
 	}
-
 	else if(menu==4){
 		lcd.setCursor(0,0);
 		lcd.print("ALTERAR TEMP MAX");
@@ -309,14 +340,14 @@ void loop() {
 			lcd.print(msg2);
 		}
 		if(mais){
-			menu = 6;
 			menuAnt = menu;
+			menu = 6;
 			delay(delaytime);
 			lcd.clear();
 		}
 		else if(menos){
-			menu = 3; 
 			menuAnt = menu;
+			menu = 3;
 			delay(delaytime);
 			lcd.clear();
 		}
@@ -338,14 +369,14 @@ void loop() {
 			lcd.print(msg2);
 		}
 		if(mais){
-			menu = 7;
 			menuAnt = menu;
+			menu = 7;
 			delay(delaytime);
 			lcd.clear();
 		}
 		else if(menos){
-			menu = 5; 
 			menuAnt = menu;
+			menu = 5; 
 			delay(delaytime);
 			lcd.clear();
 		}
@@ -367,14 +398,14 @@ void loop() {
 			lcd.print(msg2);
 		}
 		if(mais){
-			menu = 0;
 			menuAnt = menu;
+			menu = 0;
 			delay(delaytime);
 			lcd.clear();
 		}
 		else if(menos){
-			menu = 6; 
 			menuAnt = menu;
+			menu = 6; 
 			delay(delaytime);
 			lcd.clear();
 		}
@@ -387,10 +418,22 @@ void loop() {
 	else if(menu==8){
 		lcd.setCursor(0,0);
 		lcd.print("ALARME ACIONADO");
+		lcd.setCursor(0,1);
+		lcd.print("F");
+		lcd.setCursor(1,1);
+		lcd.print(funcionamento);
+		lcd.setCursor(7,1);
+		lcd.print("A");
+		lcd.setCursor(8,1);
+		lcd.print(alarme);
+		lcd.setCursor(14,1);
+		lcd.print("P");
+		lcd.setCursor(15,1);
+		lcd.print(sensorPresenca);
 		alerta(200);
 		if(confirma){
 			menu = menuAnt;
-			delayMicroseconds(5000);
+			delayMicroseconds(200);
 			delay(delaytime);
 			lcd.clear();
 		}
@@ -398,10 +441,26 @@ void loop() {
 	else if(menu==9){
 		lcd.setCursor(0,0);
 		lcd.print("SENHA");
+		lcd.setCursor(0,1);
+		lcd.print("F");
+		lcd.setCursor(1,1);
+		lcd.print(funcionamento);
+		lcd.setCursor(3,1);
+		lcd.print("AC");
+		lcd.setCursor(5,1);
+		lcd.print(acesso);
+		lcd.setCursor(7,1);
+		lcd.print("A");
+		lcd.setCursor(8,1);
+		lcd.print(alarme);
+		lcd.setCursor(10,1);
+		lcd.print("S");
+		lcd.setCursor(11,1);
+		lcd.print(senha);
 		alerta(100);
 		if(confirma){
 			menu = menuAnt;
-			delayMicroseconds(5000);
+			delayMicroseconds(200);
 			delay(delaytime);
 			lcd.clear();
 		}
@@ -409,10 +468,17 @@ void loop() {
 	else if(menu==10){
 		lcd.setCursor(0,0);
 		lcd.print("PROBLEMA TEMP");
+		lcd.print("F");
+		lcd.setCursor(1,1);
+		lcd.print(funcionamento);
+		lcd.setCursor(10,1);
+		lcd.print("T");
+		lcd.setCursor(11,1);
+		lcd.print(temperaturaAtual);
 		alerta(400);
 		if(confirma){
 			menu = menuAnt;
-			delayMicroseconds(5000);
+			delayMicroseconds(200);
 			delay(delaytime);
 			lcd.clear();
 		}
@@ -420,10 +486,22 @@ void loop() {
 	else if(menu==11){
 		lcd.setCursor(0,0);
 		lcd.print("LUZ ACESA");
-		alerta(1000);
+		lcd.print("F");
+		lcd.setCursor(1,1);
+		lcd.print(funcionamento);
+		lcd.setCursor(7,1);
+		lcd.print("L");
+		lcd.setCursor(8,1);
+		lcd.print(sensorLuz);
+		lcd.setCursor(14,1);
+		lcd.print("P");
+		lcd.setCursor(15,1);
+		lcd.print(sensorPresenca);
+		lcd.print(senha);
+		alerta(500);
 		if(confirma){
 			menu = menuAnt;
-			delayMicroseconds(5000);
+			delayMicroseconds(200);
 			delay(delaytime);
 			lcd.clear();
 		}

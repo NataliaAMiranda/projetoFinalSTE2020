@@ -1,4 +1,7 @@
 #include <Arduino.h>
+#include <Wire.h>
+
+const byte SLAVE_ADDRESS = 42; 
 char msg1[5];
 int button_zero;
 int button_um;
@@ -20,100 +23,100 @@ int blink = 0;
 
 void luzTeclado(int num){
 	if(num == 0){
+    digitalWrite(A0, LOW);
+    digitalWrite(A1, LOW);
     digitalWrite(A2, LOW);
     digitalWrite(A3, LOW);
-    digitalWrite(A4, LOW);
-    digitalWrite(A5, LOW);
   }
   else if(num == 1){
+    digitalWrite(A0, LOW);
+    digitalWrite(A1, LOW);
     digitalWrite(A2, LOW);
-    digitalWrite(A3, LOW);
-    digitalWrite(A4, LOW);
-    digitalWrite(A5, HIGH);
+    digitalWrite(A3, HIGH);
   }
   else if(num == 2){
-    digitalWrite(A2, LOW);
+    digitalWrite(A0, LOW);
+    digitalWrite(A1, LOW);
+    digitalWrite(A2, HIGH);
     digitalWrite(A3, LOW);
-    digitalWrite(A4, HIGH);
-    digitalWrite(A5, LOW);
   }
   else if(num == 3){
-    digitalWrite(A2, LOW);
-    digitalWrite(A3, LOW);
-    digitalWrite(A4, HIGH);
-    digitalWrite(A5, HIGH);
+    digitalWrite(A0, LOW);
+    digitalWrite(A1, LOW);
+    digitalWrite(A2, HIGH);
+    digitalWrite(A3, HIGH);
   }
   else if(num == 4){
+    digitalWrite(A0, LOW);
+    digitalWrite(A1, HIGH);
     digitalWrite(A2, LOW);
-    digitalWrite(A3, HIGH);
-    digitalWrite(A4, LOW);
-    digitalWrite(A5, LOW);
+    digitalWrite(A3, LOW);
   }
   else if(num == 5){
+    digitalWrite(A0, LOW);
+    digitalWrite(A1, HIGH);
     digitalWrite(A2, LOW);
     digitalWrite(A3, HIGH);
-    digitalWrite(A4, LOW);
-    digitalWrite(A5, HIGH);
   }
   else if(num == 6){
-    digitalWrite(A2, LOW);
-    digitalWrite(A3, HIGH);
-    digitalWrite(A4, HIGH);
-    digitalWrite(A5, LOW);
+    digitalWrite(A0, LOW);
+    digitalWrite(A1, HIGH);
+    digitalWrite(A2, HIGH);
+    digitalWrite(A3, LOW);
   }
   else if(num == 7){
-    digitalWrite(A2, LOW);
+    digitalWrite(A0, LOW);
+    digitalWrite(A1, HIGH);
+    digitalWrite(A2, HIGH);
     digitalWrite(A3, HIGH);
-    digitalWrite(A4, HIGH);
-    digitalWrite(A5, HIGH);
   }
   else if(num == 8){
-    digitalWrite(A2, HIGH);
+    digitalWrite(A0, HIGH);
+    digitalWrite(A1, LOW);
+    digitalWrite(A2, LOW);
     digitalWrite(A3, LOW);
-    digitalWrite(A4, LOW);
-    digitalWrite(A5, LOW);
   }
   else if(num == 9){
-    digitalWrite(A2, HIGH);
-    digitalWrite(A3, LOW);
-    digitalWrite(A4, LOW);
-    digitalWrite(A5, HIGH);
+    digitalWrite(A0, HIGH);
+    digitalWrite(A1, LOW);
+    digitalWrite(A2, LOW);
+    digitalWrite(A3, HIGH);
   }
   else if(num == 10){
+    digitalWrite(A0, HIGH);
+    digitalWrite(A1, LOW);
     digitalWrite(A2, HIGH);
     digitalWrite(A3, LOW);
-    digitalWrite(A4, HIGH);
-    digitalWrite(A5, LOW);
   }
   else if(num == 11){
+    digitalWrite(A0, HIGH);
+    digitalWrite(A1, LOW);
     digitalWrite(A2, HIGH);
-    digitalWrite(A3, LOW);
-    digitalWrite(A4, HIGH);
-    digitalWrite(A5, HIGH);
+    digitalWrite(A3, HIGH);
   }
   else if(num == 12){
-    digitalWrite(A2, HIGH);
-    digitalWrite(A3, HIGH);
-    digitalWrite(A4, LOW);
-    digitalWrite(A5, LOW);
+    digitalWrite(A0, HIGH);
+    digitalWrite(A1, HIGH);
+    digitalWrite(A2, LOW);
+    digitalWrite(A3, LOW);
   }
   else if(num == 13){
-    digitalWrite(A2, HIGH);
+    digitalWrite(A0, HIGH);
+    digitalWrite(A1, HIGH);
+    digitalWrite(A2, LOW);
     digitalWrite(A3, HIGH);
-    digitalWrite(A4, LOW);
-    digitalWrite(A5, HIGH);
   }
   else if(num == 14){
+    digitalWrite(A0, HIGH);
+    digitalWrite(A1, HIGH);
     digitalWrite(A2, HIGH);
-    digitalWrite(A3, HIGH);
-    digitalWrite(A4, HIGH);
-    digitalWrite(A5, LOW);
+    digitalWrite(A3, LOW);
   }
   else if(num == 15){
+    digitalWrite(A0, HIGH);
+    digitalWrite(A1, HIGH);
     digitalWrite(A2, HIGH);
     digitalWrite(A3, HIGH);
-    digitalWrite(A4, HIGH);
-    digitalWrite(A5, HIGH);
   }
 }
 
@@ -130,10 +133,11 @@ void setup() {
 	pinMode(11, INPUT);
   pinMode(12, INPUT);
 	pinMode(13, INPUT);
+  pinMode(A0, OUTPUT);
+  pinMode(A1, OUTPUT);
   pinMode(A2, OUTPUT);
   pinMode(A3, OUTPUT);
-  pinMode(A4, OUTPUT);
-  pinMode(A5, OUTPUT);
+  Wire.begin ();
 }
 
 void loop() {
@@ -442,8 +446,9 @@ void loop() {
     }
     if(button_enviar == 1){
       msg1[4] = salvar;
-      // enviar mensagem
-      // recebe confirmação
+      Wire.beginTransmission (SLAVE_ADDRESS);
+      Wire.write (msg1);
+      Wire.endTransmission ();
       int resp = 0;
       if(resp==0){
         luzTeclado(1);

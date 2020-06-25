@@ -2,7 +2,15 @@
 #include <Wire.h>
 
 const byte SLAVE_ADDRESS = 42; 
-char msg1[5];
+char senha_digitada[4];
+char senha0[4];
+char senha1[4];
+char senha2[4];
+char senha3[4];
+char senha4[4];
+char senha5[4];
+char senha6[4];
+char senha7[4];
 int button_zero;
 int button_um;
 int button_dois;
@@ -17,9 +25,11 @@ int button_enviar;
 int button_limpar;
 int cont = 0;
 int cont2 = 0;
+int contSenha = 1;
 int salvar = 0;
-int delaytime=200;
+int delaytime=150;
 int blink = 0;
+int valor = 12;
 
 void luzTeclado(int num){
 	if(num == 0){
@@ -137,6 +147,10 @@ void setup() {
   pinMode(A1, OUTPUT);
   pinMode(A2, OUTPUT);
   pinMode(A3, OUTPUT);
+  senha0[0] = '1';
+  senha0[0] = '1';
+  senha0[0] = '1';
+  senha0[0] = '1';
   Wire.begin ();
 }
 
@@ -154,145 +168,190 @@ void loop() {
   button_enviar = digitalRead(12);
   button_limpar = digitalRead(13);
 
-  if (cont==0){
-    if(salvar==0){
-      luzTeclado(15);
-    }
-    else if(salvar == 1){
-      luzTeclado(7);
-    }
-    if(button_zero == 1){
-      msg1[0] = '0';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_um == 1){
-      msg1[0] = '1';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_dois == 1){
-      msg1[0] = '2';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_tres == 1){
-      msg1[0] = '3';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_quatro == 1){
-      msg1[0] = '4';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_cinco == 1){
-      msg1[0] = '5';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_seis == 1){
-      msg1[0] = '6';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_sete == 1){
-      msg1[0] = '7';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_oito == 1){
-      msg1[0] = '8';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_nove == 1){
-      msg1[0] = '9';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_enviar == 1){
-      cont2 = cont2 + 1;
-      if(cont2 == 5){
-        salvar = 1;
-      }
-      else if(cont2 ==10){
-        salvar = 0;
-        cont2 = 0;
-      }
-      delay(delaytime);
-    }
+  if(button_zero){
+    valor = 0;
   }
-  else if(cont==1){
-    if(blink == 1){
-      blink = 0;
-      luzTeclado(0);
-    }
-    else if(blink == 0 ){
-      blink = 1;
-      if(salvar == 0){
-        luzTeclado(12);
-      }
-      else if(salvar == 1){
-        luzTeclado(4);
-      }
-    }
-    if(button_zero == 1){
-      msg1[1] = '0';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_um == 1){
-      msg1[1] = '1';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_dois == 1){
-      msg1[1] = '2';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_tres == 1){
-      msg1[1] = '3';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_quatro == 1){
-      msg1[1] = '4';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_cinco == 1){
-      msg1[1] = '5';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_seis == 1){
-      msg1[1] = '6';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_sete == 1){
-      msg1[1] = '7';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_oito == 1){
-      msg1[1] = '8';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_nove == 1){
-      msg1[1] = '9';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_limpar == 1){
-      cont = cont - 1;
-      delay(delaytime);
-    }
+  else if(button_um){
+    valor = 1;
   }
-  else if(cont==2){
+  else if(button_dois){
+    valor = 2;
+  }
+  else if(button_tres){
+    valor = 3;
+  }
+  else if(button_quatro){
+    valor = 4;
+  }
+  else if(button_cinco){
+    valor = 5;
+  }
+  else if(button_seis){
+    valor = 6;
+  }
+  else if(button_sete){
+    valor = 7;
+  }
+  else if(button_oito){
+    valor = 8;
+  }
+  else if(button_nove){
+    valor = 9;
+  }
+  else if(button_limpar){
+    valor = 10;
+  }
+  else if(button_enviar){
+    valor = 11;
+  }
+  else{
+    valor = 12;
+  }
+
+switch(cont){
+    case 0:
+        if(salvar==0){
+            luzTeclado(15);
+        }
+        else if(salvar == 1){
+            luzTeclado(7);
+        }
+        switch (valor){
+            case 0:
+                senha_digitada[cont] = '0';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 1:
+                senha_digitada[cont] = '1';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 2:
+                senha_digitada[cont] = '2';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 3:
+                senha_digitada[cont] = '3';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 4:
+                senha_digitada[cont] = '4';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 5:
+                senha_digitada[cont] = '5';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 6:
+                senha_digitada[cont] = '6';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 7:
+                senha_digitada[cont] = '7';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 8:
+                senha_digitada[cont] = '8';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 9:
+                senha_digitada[cont] = '9';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 11:
+                cont2 = cont2 + 1;
+                if(cont2 == 5){
+                  salvar = 1;
+                }
+                else if(cont2 ==10){
+                  salvar = 0;
+                  cont2 = 0;
+                }
+                delay(delaytime);
+            break;
+        }
+    break;
+    case 1:
+        if(blink == 1){
+          blink = 0;
+          luzTeclado(0);
+        }
+        else if(blink == 0 ){
+          blink = 1;
+          if(salvar == 0){
+            luzTeclado(12);
+          }
+          else if(salvar == 1){
+            luzTeclado(4);
+          }
+        }
+        switch (valor){
+            case 0:
+                senha_digitada[cont] = '0';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 1:
+                senha_digitada[cont] = '1';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 2:
+                senha_digitada[cont] = '2';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 3:
+                senha_digitada[cont] = '3';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 4:
+                senha_digitada[cont] = '4';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 5:
+                senha_digitada[cont] = '5';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 6:
+                senha_digitada[cont] = '6';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 7:
+                senha_digitada[cont] = '7';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 8:
+                senha_digitada[cont] = '8';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 9:
+                senha_digitada[cont] = '9';
+                cont = cont + 1;
+                delay(delaytime);
+            break;
+            case 10:
+                cont = cont - 1;
+                delay(delaytime);
+            break;
+        } 
+        break;
+    case 2:
     if(blink == 1){
       blink = 0;
       luzTeclado(0);
@@ -306,62 +365,64 @@ void loop() {
         luzTeclado(5);
       }
     }
-    if(button_zero == 1){
-      msg1[2] = '0';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_um == 1){
-      msg1[2] = '1';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_dois == 1){
-      msg1[2] = '2';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_tres == 1){
-      msg1[2] = '3';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_quatro == 1){
-      msg1[2] = '4';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_cinco == 1){
-      msg1[2] = '5';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_seis == 1){
-      msg1[2] = '6';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_sete == 1){
-      msg1[2] = '7';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_oito == 1){
-      msg1[2] = '8';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_nove == 1){
-      msg1[2] = '9';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_limpar == 1){
-      cont = cont - 1;
-      delay(delaytime);
-    }
-  }
-  else if(cont==3){
+    switch (valor){
+        case 0:
+            senha_digitada[cont] = '0';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 1:
+            senha_digitada[cont] = '1';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 2:
+            senha_digitada[cont] = '2';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 3:
+            senha_digitada[cont] = '3';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 4:
+            senha_digitada[cont] = '4';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 5:
+            senha_digitada[cont] = '5';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 6:
+            senha_digitada[cont] = '6';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 7:
+            senha_digitada[cont] = '7';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 8:
+            senha_digitada[cont] = '8';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 9:
+            senha_digitada[cont] = '9';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 10:
+            cont = cont - 1;
+            delay(delaytime);
+        break;
+    } 
+    break;
+    case 3:
     if(blink == 1){
       blink = 0;
       luzTeclado(0);
@@ -375,62 +436,64 @@ void loop() {
         luzTeclado(6);
       }
     }
-    if(button_zero == 1){
-      msg1[3] = '0';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_um == 1){
-      msg1[3] = '1';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_dois == 1){
-      msg1[3] = '2';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_tres == 1){
-      msg1[3] = '3';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_quatro == 1){
-      msg1[3] = '4';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_cinco == 1){
-      msg1[3] = '5';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_seis == 1){
-      msg1[3] = '6';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_sete == 1){
-      msg1[3] = '7';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_oito == 1){
-      msg1[3] = '8';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_nove == 1){
-      msg1[3] = '9';
-      cont = cont + 1;
-      delay(delaytime);
-    }
-    else if(button_limpar == 1){
-      cont = cont - 1;
-      delay(delaytime);
-    }
-  }
-  else if(cont==4){
+    switch (valor){
+        case 0:
+            senha_digitada[cont] = '0';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 1:
+            senha_digitada[cont] = '1';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 2:
+            senha_digitada[cont] = '2';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 3:
+            senha_digitada[cont] = '3';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 4:
+            senha_digitada[cont] = '4';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 5:
+            senha_digitada[cont] = '5';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 6:
+            senha_digitada[cont] = '6';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 7:
+            senha_digitada[cont] = '7';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 8:
+            senha_digitada[cont] = '8';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 9:
+            senha_digitada[cont] = '9';
+            cont = cont + 1;
+            delay(delaytime);
+        break;
+        case 10:
+            cont = cont - 1;
+            delay(delaytime);
+        break;
+    } 
+    break;
+    case 4:
     if(blink == 1){
       blink = 0;
       luzTeclado(0);
@@ -444,18 +507,154 @@ void loop() {
         luzTeclado(7);
       }
     }
-    if(button_enviar == 1){
-      msg1[4] = salvar;
-      Wire.beginTransmission (SLAVE_ADDRESS);
-      Wire.write (msg1);
-      Wire.endTransmission ();
-      cont = 0;
-      delay(delaytime);
-
-    }
-    else if(button_limpar == 1){
-      cont = cont - 1;
-      delay(delaytime);
-    }
+    switch (valor){
+        case 10:
+            cont = cont - 1;
+            delay(delaytime);
+        break;
+        case 11:
+            if(salvar==1){
+              switch(contSenha){
+                case 0:
+                    senha0[0] = senha_digitada[0];
+                    senha0[1] = senha_digitada[1];
+                    senha0[2] = senha_digitada[2];
+                    senha0[3] = senha_digitada[3];
+                    contSenha = contSenha + 1;
+                break;
+                case 1:
+                    senha1[0] = senha_digitada[0];
+                    senha1[1] = senha_digitada[1];
+                    senha1[2] = senha_digitada[2];
+                    senha1[3] = senha_digitada[3];
+                    contSenha = contSenha + 1;
+                break;
+                case 2:
+                    senha2[0] = senha_digitada[0];
+                    senha2[1] = senha_digitada[1];
+                    senha2[2] = senha_digitada[2];
+                    senha2[3] = senha_digitada[3];
+                    contSenha = contSenha + 1;
+                break;
+                case 3:
+                    senha3[0] = senha_digitada[0];
+                    senha3[1] = senha_digitada[1];
+                    senha3[2] = senha_digitada[2];
+                    senha3[3] = senha_digitada[3];
+                    contSenha = contSenha + 1;
+                break;
+                case 4:
+                    senha4[0] = senha_digitada[0];
+                    senha4[1] = senha_digitada[1];
+                    senha4[2] = senha_digitada[2];
+                    senha4[3] = senha_digitada[3];
+                    contSenha = contSenha + 1;
+                break;
+                case 5:
+                    senha5[0] = senha_digitada[0];
+                    senha5[1] = senha_digitada[1];
+                    senha5[2] = senha_digitada[2];
+                    senha5[3] = senha_digitada[3];
+                    contSenha = contSenha + 1;
+                break;
+                case 6:
+                    senha6[0] = senha_digitada[0];
+                    senha6[1] = senha_digitada[1];
+                    senha6[2] = senha_digitada[2];
+                    senha6[3] = senha_digitada[3];
+                    contSenha = contSenha + 1;
+                break;
+                case 7:
+                    senha7[0] = senha_digitada[0];
+                    senha7[1] = senha_digitada[1];
+                    senha7[2] = senha_digitada[2];
+                    senha7[3] = senha_digitada[3];
+                    contSenha = 0;
+                break;
+              }
+            }
+            else{
+               if((senha0[0]==senha_digitada[0])&&(senha0[1]==senha_digitada[1])&&(senha0[2]==senha_digitada[2])&&(senha0[3]==senha_digitada[3])){
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('1');
+                  Wire.endTransmission ();
+                  delay(500);
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('0');
+                  Wire.endTransmission ();
+               }
+               else if((senha1[0]==senha_digitada[0])&&(senha1[1]==senha_digitada[1])&&(senha1[2]==senha_digitada[2])&&(senha1[3]==senha_digitada[3])){
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('1');
+                  Wire.endTransmission ();
+                  delay(500);
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('0');
+                  Wire.endTransmission ();
+               }
+               else if((senha2[0]==senha_digitada[0])&&(senha2[1]==senha_digitada[1])&&(senha2[2]==senha_digitada[2])&&(senha2[3]==senha_digitada[3])){
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('1');
+                  Wire.endTransmission ();
+                  delay(500);
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('0');
+                  Wire.endTransmission ();
+               }
+               else if((senha3[0]==senha_digitada[0])&&(senha3[1]==senha_digitada[1])&&(senha3[2]==senha_digitada[2])&&(senha3[3]==senha_digitada[3])){
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('1');
+                  Wire.endTransmission ();
+                  delay(500);
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('0');
+                  Wire.endTransmission ();
+               }
+               else if((senha4[0]==senha_digitada[0])&&(senha4[1]==senha_digitada[1])&&(senha4[2]==senha_digitada[2])&&(senha4[3]==senha_digitada[3])){
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('1');
+                  Wire.endTransmission ();
+                  delay(500);
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('0');
+                  Wire.endTransmission ();
+               }
+               else if((senha5[0]==senha_digitada[0])&&(senha5[1]==senha_digitada[1])&&(senha5[2]==senha_digitada[2])&&(senha5[3]==senha_digitada[3])){
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('1');
+                  Wire.endTransmission ();
+                  delay(500);
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('0');
+                  Wire.endTransmission ();
+               }
+               else if((senha6[0]==senha_digitada[0])&&(senha6[1]==senha_digitada[1])&&(senha6[2]==senha_digitada[2])&&(senha6[3]==senha_digitada[3])){
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('1');
+                  Wire.endTransmission ();
+                  delay(500);
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('0');
+                  Wire.endTransmission ();
+               }
+               else if((senha7[0]==senha_digitada[0])&&(senha7[1]==senha_digitada[1])&&(senha7[2]==senha_digitada[2])&&(senha7[3]==senha_digitada[3])){
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('1');
+                  Wire.endTransmission ();
+                  delay(500);
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('0');
+                  Wire.endTransmission ();
+               }
+               else{
+                  Wire.beginTransmission (SLAVE_ADDRESS);
+                  Wire.write ('0');
+                  Wire.endTransmission ();
+               }
+            }
+            delay(delaytime); 
+        break;
+    }      
+    break;
   }
 }

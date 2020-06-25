@@ -4,7 +4,7 @@
 
 LiquidCrystal lcd(12,11,5,4,3,2);
 
-const byte MY_ADDRESS = 42; // endereço so escrevo. precisa configurar no mestre também!
+const byte SLAVE_ADDRESS = 42; // endereço do escravo a ser enviado dados!
 #define DS18B20_PIN  A0
 
 char msg1[16] = "[ ]SIM  [*]NAO";
@@ -18,6 +18,7 @@ float temperaturaAtual;
 float temperaturaLimite = 23.00;
 int menu = 0;
 
+volatile byte recebido;
 int funcionamento = 0;
 int acesso = 0;
 int temperatura = 0;
@@ -25,11 +26,12 @@ int presenca = 0;
 int luminosidade = 0; 
 int alarme = 0;
 
+
 int sensorPresenca = 0;
 int sensorLuz = 0;
-int senha = 0;
 int senhaMax = 9530;
 int autorizacaoAcesso = 0;
+int porta_aberta =0;
  
 bool ds18b20_start(){
 	bool ret = 0;
@@ -128,8 +130,22 @@ void alerta(int tempo){
 	digitalWrite(13, LOW);
 }
 
+void receiveEvent (int howMany){
+	if (Wire.available () > 0){
+		recebido = Wire.read();
+		if(recebido=='1'){
+			digitalWrite(A1, HIGH);
+		}
+		else{
+			digitalWrite(A1, LOW);
+		}
+	}
+
+}
+
 void setup(){
 	pinMode(A0, INPUT);
+	pinMode(A1, OUTPUT);
 	pinMode(0, INPUT);
 	pinMode(1, INPUT);
 	pinMode(6, INPUT);
@@ -137,6 +153,9 @@ void setup(){
 	pinMode(8, INPUT);
 	pinMode(10, OUTPUT);
 	pinMode(13, OUTPUT);
+	Wire.begin (SLAVE_ADDRESS);
+	Wire.onReceive(receiveEvent); // register event
+  	Serial.begin(9600);           // start serial for outpu
 	inicializar();
 }
 
@@ -148,203 +167,198 @@ void loop() {
 	confirma  = digitalRead(8);
 	temperaturaAtual = medirTemp(raw_temp);
 
-	//int senha = digitalRead(); //add teclado
-
 	if((funcionamento==1)&&(alarme==1)&&(sensorPresenca==1)){
 		menu = 8;
 		lcd.clear();
 	}
-	else if((funcionamento==1)&&(acesso==1)&&(senha!=0)&&(alarme==0)){
+	else if((funcionamento==1)&&(temperaturaAtual > temperaturaLimite)){
 		menu = 9;
 		lcd.clear();
 	}
-	else if((funcionamento==1)&&(temperaturaAtual > temperaturaLimite)){
+	else if((funcionamento==1)&&(sensorPresenca==0)&&(sensorLuz==1)){
 		menu = 10;
 		lcd.clear();
 	}
-	else if((funcionamento==1)&&(sensorPresenca==0)&&(sensorLuz==1)){
-		menu = 11;
-		lcd.clear();
-	}
-	else if(menu==0){
-		lcd.setCursor(0,0);
-		lcd.print("SERVICO ATIVADO");
-		if(funcionamento==0){	
+	switch(menu){
+		case 0:
+			lcd.setCursor(0,0);
+			lcd.print("SERVICO ATIVADO");
+			if(funcionamento==0){	
+				lcd.setCursor(0,1);
+				lcd.print(msg1);
+			}
+			else{
+				lcd.setCursor(0,1);
+				lcd.print(msg2);
+			}
+			if(mais){
+				menu = 1;
+				delay(delaytime);
+				lcd.clear();
+			}
+			else if(menos){
+				menu = 7;
+				delay(delaytime);
+				lcd.clear();
+			}
+			else if(confirma){
+				funcionamento = funcionamento xor 1;
+				delay(delaytime);
+				lcd.clear();
+			}
+		break;
+		case 1:
+			lcd.setCursor(0,0);
+			lcd.print("CONTROLE ACESSO");
+			if(acesso==0){	
+				lcd.setCursor(0,1);
+				lcd.print(msg1);
+			}
+			else{
+				lcd.setCursor(0,1);
+				lcd.print(msg2);
+			}
+			if(mais){
+				menu = 2;
+				delay(delaytime);
+				lcd.clear();
+			}
+			else if(menos){
+				menu = 0;
+				delay(delaytime);
+				lcd.clear();
+			}
+			else if(confirma){
+				acesso = acesso xor 1;
+				delay(delaytime);
+				lcd.clear();
+			}
+		break;
+		case 2:
+			lcd.setCursor(0,0);
+			lcd.print("CONTROLE TEMPE");
+			if(temperatura==0){	
+				lcd.setCursor(0,1);
+				lcd.print(msg1);
+			}
+			else{
+				lcd.setCursor(0,1);
+				lcd.print(msg2);
+			}
+			if(mais){
+				menu = 3;
+				delay(delaytime);
+				lcd.clear();
+			}
+			else if(menos){
+				menu = 1; 
+				delay(delaytime);
+				lcd.clear();
+			}
+			else if(confirma){
+				temperatura = temperatura xor 1;
+				delay(delaytime);
+				lcd.clear();
+			}
+		break;
+		case 3:
+			lcd.setCursor(0,0);
+			lcd.print("TEMPERATURA MAX");
 			lcd.setCursor(0,1);
-			lcd.print(msg1);
-		}
-		else{
+			lcd.print(temperaturaLimite);
+			if(mais){
+				menu = 5;
+				delay(delaytime);
+				lcd.clear();
+			}
+			else if(menos){
+				menu = 2;
+				delay(delaytime);
+				lcd.clear();
+			}
+			else if(confirma){
+				menu = 4;
+				delay(delaytime);
+				lcd.clear();
+			}
+		break;
+		case 4:
+			lcd.setCursor(0,0);
+			lcd.print("ALTERAR TEMP MAX");
 			lcd.setCursor(0,1);
-			lcd.print(msg2);
-		}
-		if(mais){
-			menu = 1;
-			delay(delaytime);
-			lcd.clear();
-		}
-		else if(menos){
-			menu = 7;
-			delay(delaytime);
-			lcd.clear();
-		}
-		else if(confirma){
-			funcionamento = funcionamento xor 1;
-			delay(delaytime);
-			lcd.clear();
-		}
-	}
-	else if(menu==1){
-		lcd.setCursor(0,0);
-		lcd.print("CONTROLE ACESSO");
-		if(acesso==0){	
-			lcd.setCursor(0,1);
-			lcd.print(msg1);
-		}
-		else{
-			lcd.setCursor(0,1);
-			lcd.print(msg2);
-		}
-		if(mais){
-			menu = 2;
-			delay(delaytime);
-			lcd.clear();
-		}
-		else if(menos){
-			menu = 0;
-			delay(delaytime);
-			lcd.clear();
-		}
-		else if(confirma){
-			acesso = acesso xor 1;
-			delay(delaytime);
-			lcd.clear();
-		}
-	}
-	else if(menu==2){
-		lcd.setCursor(0,0);
-		lcd.print("CONTROLE TEMPE");
-		if(temperatura==0){	
-			lcd.setCursor(0,1);
-			lcd.print(msg1);
-		}
-		else{
-			lcd.setCursor(0,1);
-			lcd.print(msg2);
-		}
-		if(mais){
-			menu = 3;
-			delay(delaytime);
-			lcd.clear();
-		}
-		else if(menos){
-			menu = 1; 
-			delay(delaytime);
-			lcd.clear();
-		}
-		else if(confirma){
-			temperatura = temperatura xor 1;
-			delay(delaytime);
-			lcd.clear();
-		}
-	}
-	else if(menu==3){
-		lcd.setCursor(0,0);
-		lcd.print("TEMPERATURA MAX");
-		lcd.setCursor(0,1);
-		lcd.print(temperaturaLimite);
-		if(mais){
-			menu = 5;
-			delay(delaytime);
-			lcd.clear();
-		}
-		else if(menos){
-			menu = 2;
-			delay(delaytime);
-			lcd.clear();
-		}
-		else if(confirma){
-			menu = 4;
-			delay(delaytime);
-			lcd.clear();
-		}
-	}
-	else if(menu==4){
-		lcd.setCursor(0,0);
-		lcd.print("ALTERAR TEMP MAX");
-		lcd.setCursor(0,1);
-		lcd.print(temperaturaLimite);
-		if(mais&&(temperaturaLimite<=100)){
-			temperaturaLimite = temperaturaLimite + 1;
-			delay(delaytime);
-			lcd.clear();
-		}
-		else if(menos&&(temperaturaLimite>=15)){
-			temperaturaLimite = temperaturaLimite - 1;
-			delay(delaytime);
-			lcd.clear();
-		}
-		else if(confirma){
-			menu = 3;
-			delay(delaytime);
-			lcd.clear();
-		}
-	}
-	else if(menu==5){
-		lcd.setCursor(0,0);
-		lcd.print("MONITOR PRESENCA");
-		if(presenca==0){	
-			lcd.setCursor(0,1);
-			lcd.print(msg1);
-		}
-		else{
-			lcd.setCursor(0,1);
-			lcd.print(msg2);
-		}
-		if(mais){
-			menu = 6;
-			delay(delaytime);
-			lcd.clear();
-		}
-		else if(menos){
-			menu = 3;
-			delay(delaytime);
-			lcd.clear();
-		}
-		else if(confirma){
-			presenca = presenca xor 1;
-			delay(delaytime);
-			lcd.clear();
-		}
-	}
-	else if(menu==6){
-		lcd.setCursor(0,0);
-		lcd.print("CONTROLE LUMUS");
-		if(luminosidade==0){	
-			lcd.setCursor(0,1);
-			lcd.print(msg1);
-		}
-		else{
-			lcd.setCursor(0,1);
-			lcd.print(msg2);
-		}
-		if(mais){
-			menu = 7;
-			delay(delaytime);
-			lcd.clear();
-		}
-		else if(menos){
-			menu = 5; 
-			delay(delaytime);
-			lcd.clear();
-		}
-		else if(confirma){
-			luminosidade = luminosidade xor 1;
-			delay(delaytime);
-			lcd.clear();
-		}
-	}
-	else if(menu==7){
-		lcd.setCursor(0,0);
+			lcd.print(temperaturaLimite);
+			if(mais&&(temperaturaLimite<=100)){
+				temperaturaLimite = temperaturaLimite + 1;
+				delay(delaytime);
+				lcd.clear();
+			}
+			else if(menos&&(temperaturaLimite>=15)){
+				temperaturaLimite = temperaturaLimite - 1;
+				delay(delaytime);
+				lcd.clear();
+			}
+			else if(confirma){
+				menu = 3;
+				delay(delaytime);
+				lcd.clear();
+			}
+		break;
+		case 5:
+			lcd.setCursor(0,0);
+			lcd.print("MONITOR PRESENCA");
+			if(presenca==0){	
+				lcd.setCursor(0,1);
+				lcd.print(msg1);
+			}
+			else{
+				lcd.setCursor(0,1);
+				lcd.print(msg2);
+			}
+			if(mais){
+				menu = 6;
+				delay(delaytime);
+				lcd.clear();
+			}
+			else if(menos){
+				menu = 3;
+				delay(delaytime);
+				lcd.clear();
+			}
+			else if(confirma){
+				presenca = presenca xor 1;
+				delay(delaytime);
+				lcd.clear();
+			}
+		break;
+		case 6:
+			lcd.setCursor(0,0);
+			lcd.print("CONTROLE LUMUS");
+			if(luminosidade==0){	
+				lcd.setCursor(0,1);
+				lcd.print(msg1);
+			}
+			else{
+				lcd.setCursor(0,1);
+				lcd.print(msg2);
+			}
+			if(mais){
+				menu = 7;
+				delay(delaytime);
+				lcd.clear();
+			}
+			else if(menos){
+				menu = 5; 
+				delay(delaytime);
+				lcd.clear();
+			}
+			else if(confirma){
+				luminosidade = luminosidade xor 1;
+				delay(delaytime);
+				lcd.clear();
+			}
+		break;
+		case 7:
+			lcd.setCursor(0,0);
 		lcd.print("ALARME");
 		if(alarme==0){	
 			lcd.setCursor(0,1);
@@ -369,84 +383,61 @@ void loop() {
 			delay(delaytime);
 			lcd.clear();
 		}
-	}
-	else if(menu==8){
-		lcd.setCursor(0,0);
-		lcd.print("ALARME ACIONADO");
-		lcd.setCursor(0,1);
-		lcd.print("F");
-		lcd.setCursor(1,1);
-		lcd.print(funcionamento);
-		lcd.setCursor(7,1);
-		lcd.print("A");
-		lcd.setCursor(8,1);
-		lcd.print(alarme);
-		lcd.setCursor(14,1);
-		lcd.print("P");
-		lcd.setCursor(15,1);
-		lcd.print(sensorPresenca);
-		alerta(200);
-		menu = 0;
-		delay(delaytime);
-		lcd.clear();
-	}
-	else if(menu==9){
-		lcd.setCursor(0,0);
-		lcd.print("SENHA");
-		lcd.setCursor(0,1);
-		lcd.print("F");
-		lcd.setCursor(1,1);
-		lcd.print(funcionamento);
-		lcd.setCursor(3,1);
-		lcd.print("AC");
-		lcd.setCursor(5,1);
-		lcd.print(acesso);
-		lcd.setCursor(7,1);
-		lcd.print("A");
-		lcd.setCursor(8,1);
-		lcd.print(alarme);
-		lcd.setCursor(10,1);
-		lcd.print("S");
-		lcd.setCursor(11,1);
-		lcd.print(senha);
-		alerta(100);
-		menu = 0;
-		delay(delaytime);
-		lcd.clear();
-	}
-	else if(menu==10){
-		lcd.setCursor(0,0);
-		lcd.print("PROBLEMA TEMP");
-		lcd.print("F");
-		lcd.setCursor(1,1);
-		lcd.print(funcionamento);
-		lcd.setCursor(10,1);
-		lcd.print("T");
-		lcd.setCursor(11,1);
-		lcd.print(temperaturaAtual);
-		alerta(400);
-		menu = 0;
-		delay(delaytime);
-		lcd.clear();
-	}
-	else if(menu==11){
-		lcd.setCursor(0,0);
-		lcd.print("LUZ ACESA");
-		lcd.print("F");
-		lcd.setCursor(1,1);
-		lcd.print(funcionamento);
-		lcd.setCursor(7,1);
-		lcd.print("L");
-		lcd.setCursor(8,1);
-		lcd.print(sensorLuz);
-		lcd.setCursor(14,1);
-		lcd.print("P");
-		lcd.setCursor(15,1);
-		lcd.print(sensorPresenca);
-		lcd.print(senha);
-		alerta(500);
-		menu = 0;
-		delay(delaytime);
-		lcd.clear();
+		break;
+		case 8:
+			lcd.setCursor(0,0);
+			lcd.print("ALARME ACIONADO");
+			lcd.setCursor(0,1);
+			lcd.print("F");
+			lcd.setCursor(1,1);
+			lcd.print(funcionamento);
+			lcd.setCursor(7,1);
+			lcd.print("A");
+			lcd.setCursor(8,1);
+			lcd.print(alarme);
+			lcd.setCursor(14,1);
+			lcd.print("P");
+			lcd.setCursor(15,1);
+			lcd.print(sensorPresenca);
+			alerta(200);
+			menu = 0;
+			delay(delaytime);
+			lcd.clear();
+			break;
+		case 9:
+			lcd.setCursor(0,0);
+			lcd.print("PROBLEMA TEMP");
+			lcd.print("F");
+			lcd.setCursor(1,1);
+			lcd.print(funcionamento);
+			lcd.setCursor(10,1);
+			lcd.print("T");
+			lcd.setCursor(11,1);
+			lcd.print(temperaturaAtual);
+			alerta(400);
+			menu = 0;
+			delay(delaytime);
+			lcd.clear();
+		break;
+		case 10:
+			lcd.setCursor(0,0);
+			lcd.print("LUZ ACESA");
+			lcd.print("F");
+			lcd.setCursor(1,1);
+			lcd.print(funcionamento);
+			lcd.setCursor(7,1);
+			lcd.print("L");
+			lcd.setCursor(8,1);
+			lcd.print(sensorLuz);
+			lcd.setCursor(14,1);
+			lcd.print("P");
+			lcd.setCursor(15,1);
+			lcd.print(sensorPresenca);
+			lcd.print(presenca);
+			alerta(500);
+			menu = 0;
+			delay(delaytime);
+			lcd.clear();
+		break;
 	}
 }
